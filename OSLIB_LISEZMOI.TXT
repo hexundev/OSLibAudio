@@ -1,0 +1,24 @@
+OldSchool Library pour PSP
+--------------------------
+
+Par Florian Brönnimann.
+C'est une librairie facilement extensible pour faire de jolis jeux, apps et
+démos en 2D.
+Il vous apporte la puissance du GPU de la PSP sans avoir besoin d'apprendre
+ses subtilités.
+
+* Pour de la documentation, lisez Doc/english/index.htm.
+* Pour une documentation technique, lisez Doc/doxygen/index.html. Allez sur l'onglet Modules pour avoir une bonne vue d'ensemble (fonctions triées par thème).
+
+Rendez-vous sur mon site: http://brunni.dev-fr.org pour télécharger les dernières
+mises à jour.
+Pour télécharger des exemples additionnels:
+http://oslib.palib.info/samples
+Il y a des nouveaux exemples, notamment un lisant des mp3.
+
+
+Special thanks
+--------------
+
+Merci à Yodajr et sa soeur pour la traduction anglaise et quelques exemples.
+

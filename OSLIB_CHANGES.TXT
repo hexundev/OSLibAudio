@@ -1,0 +1,90 @@
+Version 2.01
+------------
+
+* New / Added functionality:
+----------------------------
+ - Added mp3 and atrac3(plus) playing with hardware decoding. (requires kernel mode). The mp3 player is limited because it requires untagged files, and with a sample rate of 44100 Hz.
+ - Added oslSetExitCallback (function to be called when the application is exited).
+ - Corrected the problem in PNG loading that didn't take in account the transparent color of files containing a palette.
+ - Corrected the fact that files names containing dots couldn't be loaded.
+ - Corrected oslWriteImageFile, which was crashing in some conditions.
+ - Added oslImageIsMirroredH and oslImageIsMirroredV.
+ - All loaded images are now swizzled by default! Unless you add OSL_UNSWIZZLED to the location flags (e.g.: OSL_IN_VRAM | OSL_UNSWIZZLED). You can revert to the default behaviour by calling oslSetImageAutoSwizzle(0) before loading any file.
+ - Added the possibility of redirecting analog to D-Pad with a specific sensivity.
+ - oslSet/GetImagePixel now also work with swizzled images! (but of course it is slower in these cases).
+ - Corrected the crash that did happened when you were drawing an image with rotation and null stretchX/Y values.
+ - Better security with the VF_MEMORY VirtualFileSource.
+ - Added oslGetRamStatus (returns the free amount of RAM).
+ - Added oslDeleteMap (deletes a map).
+ - Corrected the problems with fonts that did happen in the 2.00 release.
+ - Copying swizzled images now work correctly.
+ - The OSLib splash screen (1) doesn't need additional files anymore.
+
+* Breaking changes:
+-------------------
+ - The images are now swizzled automatically when you load them (oslLoadImageFile and so on), but not when you create them (oslCreateImage). Thus, you cannot manipulate them how you want directly. To quickly port a project that was using the old conventions, call oslSetImageAutoSwizzle(0) at the beginning (before loading any file).
+ - oslUncacheImageAll renamed to oslUncacheImage (more logical: uncaches the whole image)
+ - oslUncacheImage renamed to oslUncacheImageData (only decaches the image data, not the palette)
+
+
+Version 2.00 alpha 1
+--------------------
+
+Added / changed functionality:
+ - osl_keys->pressed.thing replaced with osl_pad.pressed.thing (old method is still available)
+ - New audio formats: MOD, S3M, IT and XM! WARNING: ONLY ONE OF THESE FILES CAN BE PLAYED AT ONCE! Only BGM and WAV support multiple instances.
+ - VRAM manager added: you can now load and unload images from VRAM in any order :) Can be disabled.
+ - You can move images from RAM <=> VRAM at any time!
+ - You can now unswizzle images, and swizzle them more easily (even directly when creating)!
+ - You can now directly load paletted images, create paletted image from a true color one, convert between image formats!
+ - You can draw and read single pixels on images
+ - You can set an automatic fatal error message to display if any file could not be loaded.
+ - New map format supporting tile mirroring!
+ - Highly optimized map drawing routine. Runs as fast as oslDrawMapSimple before but without any limitation!
+ - New 4-bit font format: you can display colorful characters, which can be tinted!
+ - New text engine, running faster, except if you set a non fully transparent background color.
+ - Faster image drawing. Rotated images, even big ones are drawn as fast as other. oslDrawImage is faster and you don't need to use oslDrawImageSimple anymore. Computed coordinates for rotated images are more precise now, the rotation will appear perfectly smooth.
+ - Better sound mixer. If you play another sound on a busy channel, the old sound will stop. You cannot play the same sound on several channels though, you must create multiple instances.
+ - New effect OSL_FX_TINT, allowing to tint objects.
+ - New variables OSL_SCREEN_WIDTH / HEIGHT (depends on the current drawbuffer)
+ - You can now define the framerate you want!
+ - Dithering can be enabled / disabled (disabled by default).
+ - The resolution can be changed on the fly (just call oslInitGfx again)!
+ - The default display list size can be redefined (more or less instructions before needing a oslSyncDrawing).
+ - oslInit has got new arguments to make OSLib it more or less intrusive.
+ - New text functions (GetStringWidth, ...).
+ - New virtual file system! Everything can now be loaded from a file, memory or a custom device you created by yourself.
+ - You can now define an alpha value to set to the drawbuffer for written pixels!
+ - Better and cleaner synchronization code.
+   - You should no more see tearing on top of the screen when sound puts a heavy load on the CPU.
+
+
+BUgfixes:
+ - Clipping is now defined automatically with oslSetDrawBuffer!
+ - On PC, any texture type is now supported; if the hardware does not support a format, it's automatically converted.
+
+
+Breaking changes (I've put here any internal modification that could have an effect on running code; if you were using documented features only, you should not have any problem. Also, it lists all changes since the last version and some of changes since the very first version (those which I remember of); you should not be concerned by some of them):
+ - OSL_IMAGE->autoStrip removed. Replaced with oslImageSetAutoStrip and oslImageGetAutoStrip!
+ - oslSwizzleImage renamed to oslSwizzleImageTo (oslSwizzleImage takes one argument now: the image to be swizzled directly)
+ - oslCopyImage renamed to oslCopyImageTo
+ - OSL_IMAGE.isCopy and OSL_IMAGE.isSwizzled replaced by oslImageIsCopy(OSL_IMAGE) and oslImageIsSwizzled(OSL_IMAGE).
+ - oslSetChannelVolume removed (set the sound's volume itself instead, that is OSL_SOUND->volumeLeft / volumeRight = ...). Should simplify your code.
+ - Untextured geometry colors are now blended, taking in account the oslSetAlpha values. If you did blend by yourself, remove your code. If you expected them to be drawn directly (opaque), you'll have to disable alpha before drawing them, just like you would have done with an image. A deprecated trick is to set osl_currentAlphaCoeff to 0xffffffff but it's not very reliable and not assured to work in the future (and will mess up oslGetAlphaEx and so on).
+ - oslCos and oslSin now uses floats only! There is oslSini and oslCosi which uses integers instead.
+ - oslLoadImageFile will not read images if the extension is not .png (or .gif or .jpg)! If you've renamed your files, this will not work anymore. Please use oslLoadImageFilePNG instead.
+ - Use oslSetDithering rather than sceGuEnable(GU_DITHER), it's cleaner as it stores the current state so that you can retreive it ;)
+ - oslGetImageSizeX and oslGetImageSizeY renamed to oslGetImageWidth and oslGetImageHeight, and even if older are still accessible, you should rename your calls to these functions.
+ - oslLoadPalette renamed to oslCreatePaletteFrom.
+ - Most of the vfpu functions have been removed, they were undocumented anyway and are completely useless because now the FPU is used in standard, just beware of using float and never double values! Also for floating constants: don't do 'f * 0.1' but 'f * 0.1f'):
+    - Replace r = vfpu_add(f1, f2) by r = f1 + f2 (it will be even faster)
+    - Replace r = vfpu_sub(f1, f2) by r = f1 - f2 (same)
+    - Replace r = vfpu_mul(f1, f2) by r = f1 * f2
+    - Replace r = vfpu_div(f1, f2) by r = f1 / f2
+    - Replace r = vfpu_f2i(v) by r = (int)v
+    - Replace r = vfpu_i2f(v) by r = (float)v
+    - vfpu_sini(f1, f2) and vfpu_cosi(f1, f2) were buggy, use oslCos and oslSin or oslCosi and oslSini.
+    - Replace r = vfpu_isubf(f1, f2) by r = (int)(f1 - f2).
+ - osl_currentAlphaCoeff now contains the color tint. If you did call for example oslSetAlpha(OSL_FX_ALPHA, 0x80) it would have contained 0x80, but now it will contain 0x80ffffff.
+
+

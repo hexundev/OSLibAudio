@@ -1,0 +1,92 @@
+Version 2.01
+------------
+
+* Nouveautés:
+-------------
+ - Ajout de la lecture mp3 et atrac3(plus) en hardware (nécessite le mode kernel). La lecture mp3 est limitée car il faut que le fichier ne soit pas tagué et soit en 44100 Hz.
+ - Ajouté oslSetExitCallback (fonction à appeler lorsque l'application est terminée).
+ - Corrigé le problème du chargement de PNG palettés qui ne tenaient pas en compte la couleur transparente.
+ - Corrigé le problème qui empêchait de charger un fichier dont le nom contenait un point.
+ - Corrigé le bug de oslWriteImageFile qui plantait.
+ - Ajouté oslImageIsMirroredH et oslImageIsMirroredV.
+ - Les images chargées sont à présent swizzlées automatiquement par défaut, à moins que vous ajoutiez OSL_UNSWIZZLED aux flags de placement (ex: OSL_IN_VRAM | OSL_UNSWIZZLED). Vous pouvez revenir au comportement par défaut en appelant oslSetImageAutoSwizzle(0) au démarrage.
+ - Ajouté une possibilité de faire analog to D-Pad au OSL_CONTROLLER.
+ - oslSet/GetImagePixel fonctionnent maintenant aussi pour les images swizzlées (mais c'est bien évidemment plus lent de dessiner sur une image swizzlée...).
+ - Corrigé le problème de plantage lorsqu'on dessine une image avec rotation et stretchX/Y nuls.
+ - Meilleure sécurité avec la VirtualFileSource VF_MEMORY.
+ - Ajout de oslGetRamStatus (RAM libre).
+ - Ajout de oslDeleteMap.
+ - Corrigé le bug des fontes de la version alpha 1.
+ - La copie d'images swizzlées fonctionne à présent.
+ - Le splash screen OSLib (1) n'a plus besoin de fichiers additionnels.
+
+* Changements qui font tout péter:
+----------------------------------
+ - Les images sont swizzlées automatiquement lorsque vous les chargez (oslLoadImageFile), mais pas lorsque vous les créez. Vous ne pouvez donc pas les manipuler comme vous voulez. Pour retrouver la compatibilité dans un projet déjà commencé, appelez oslSetImageAutoSwizzle(0) au démarrage (avant de charger vos fichiers).
+ - oslUncacheImageAll renommé en oslUncacheImage (plus logique: décache l'image entière)
+ - oslUncacheImage renommé en oslUncacheImageData (ne décache que les données de l'image, pas la palette)
+
+
+
+Version 2.00 alpha 1
+--------------------
+
+Ajouts & modifications:
+ - osl_keys->pressed.truc remplacé par osl_pad.pressed.truc (l'ancienne méthode est toujours disponible)
+ - Nouveaux formats audio: MOD, S3M, IT et XM! ATTENTION: UN SEUL FICHIER DE CES FORMATS NE PEUT ÊTRE JOUÉ À LA FOIS! Seuls le BGM et le WAV supportent les instances multiples.
+ - Nouveau système de gestion dynamique de VRAM: vous pouvez charger et décharger des images de la VRAM cmome vous le voulez :)
+ - Vous pouvez maintenant déplacer des images de RAM <=> VRAM à n'importe quel moment!
+ - Vous pouvez "déswizzler" les images, et les swizzler plus facilement (même à leur création)!
+ - Vous pouvez maintenant directement charger des images palettées, créer une image palettée depuis une image "true color" (16 ou 32 bits) ou encore convertir entre deux pixel formats différents!
+ - Possibilité de lire et écrire des pixels isolés sur l'image.
+ - Vous pouvez définir si vous voulez automatiquement afficher un message d'erreur lorsqu'un fichier n'a pas pu être chargé (et le jeu quitte direct ensuite).
+ - Nouveau format de maps supportant le mirroring des tiles comme sur GBA.
+ - Routine de map plus optimisée. Aussi rapide que oslDrawMapSimple mais sans les limitations.
+ - Nouveau format de police 4 bits: vous pouvez afficher des caractères plus sophistiqués, qui peuvent être tintés.
+ - Nouveau moteur de texte, plus rapide si vous désactivez l'arrière plan opaque.
+ - Dessin d'image plus rapide. Maintenant, les grandes images tournées sont également dessinées rapidement. oslDrawImage est plus rapide et vous n'avez plus besoin d'utiliser oslDrawImageSimple.
+ - Les coordonnées calculées de l'image pour les images rotationnées sont plus précises; la rotation est de meilleure qualité.
+ - Meilleur mixeur son. Si vous jouez un son sur une voie déjà occupée, l'ancien son sera coupé et le nouveau démarrera. Vous ne pouvez par contre pas jouer un même son sur plusieurs voies, il faut créer plusieurs instances.
+ - Nouvel effet: OSL_FX_TINT, permettant de tinter ses objets.
+ - Nouvelles variables OSL_SCREEN_WIDTH / HEIGHT (dépendent du drawbuffer courant).
+ - Vous pouvez maintenant définir le framerate que vous voulez (ex. 50 fps).
+ - Le dithering (tramage de l'image en mode 16 bits) peut être activé / désactivé (désactivé par défaut).
+ - La résolutionp peut maintenant être changée à tout moment, il faut juste appeler oslInitGfx avec la nouvelle résolution.
+ - La taille de la display list par défaut peut être redéfinie (influe sur le nombre d'instructions graphiques que vous pourrez exécuter avant d'avoir besoin d'appeler oslSyncDrawing).
+ - oslInit a maintenant de nouveaux arguments qui permettent éventuellement à OSLib d'être moins intrusive.
+ - Nouvelles fonctions de texte (GetStringWidth, ...).
+ - Nouveau système de fichiers virtuels! Tout peut maintenant être chargé depuis un fichier ou la mémoire ou une device personnalisée.
+ - Vous pouvez définir une valeur de alpha à écrire sur le drawbuffer en même temps que les pixels écrits (oslSetAlphaWrite). Utile pour le dessin sur image.
+ - Nouveau code de synchronisation, meilleur et plus propre.
+   - Fixé le problème du cisaillement qui pouvait apparaître sur le haut de l'écran lorsque le son demandait beaucoup de CPU.
+
+
+Bugfixes:
+ - Le clipping est défini automatiquement avec oslSetDrawBuffer!
+ - Sur PC, tous les types de texture sont maintenant supportés; si le hardware ne supporte pas un format, il sera convertit automatiquement.
+
+
+"Breaking changes" (j'ai mis ici toutes les modifications internes qui pourraient avoir un effet sur votre code; si vous utilisiez les features documentées, cela ne devrait pas poser de problème. Cette section liste aussi tous les changements depuis la dernière version ainsi que certains changements depuis la toute première version (ceux dont je me souviens); vous ne devriez pas être concernés par la plupart d'entre eux).
+ - OSL_IMAGE->autoStrip retiré. Remplacé par oslImageSetAutoStrip et oslImageGetAutoStrip!
+ - oslSwizzleImage renommé en oslSwizzleImageTo (oslSwizzleImage demande un seul argument à présent: l'image à swizzler directement)
+ - oslCopyImage renommé vers oslCopyImageTo.
+ - OSL_IMAGE.isCopy et OSL_IMAGE.isSwizzled remplacés par oslImageIsCopy(OSL_IMAGE) et oslImageIsSwizzled(OSL_IMAGE).
+ - oslSetChannelVolume retiré (définissez directement le volume du son au lieu de ça, c-à-d avec OSL_SOUND->volumeLeft / volumeRight = ...). Devrait simplifier votre code.
+ - La géométrie non texturée (rectangles, lignes, etc.) prennent maintenant les valeurs d'alpha en compte (oslSetAlpha). Si vous faisiez le blending par vous même, retirez votre code. Si vous vous attendiez à ce qu'ils soient dessinés de façon opaque, vous devrez désactiver l'alpha avant de les dessiner, comme vous auriez fait pour une image. Une bidouille dépréciée est de définir osl_currentAlphaCoeff à 0xffffffff, mais ce n'est pas assuré de rester compatible dans le futur (et ça risque aussi de causer des problèmes avec oslGetAlphaEx et autres si vous ne restaurez pas la valeur initiale).
+ - oslCos et oslSin utilisent des float only à présent! Il y a oslSini et oslCosi qui utilisent des entiers à la place (mais ce n'est pas exactement pareil).
+ - oslLoadImageFile ne lira pas les images dont l'extension n'est pas .png (ou .gif ou .jpg)! Si vous aviez changé l'extension de vos fichiers, cela ne fonctionnera plus. Utilisez plutôt oslLoadImageFilePNG.
+ - Utilisez oslSetDithering plutôt que sceGuEnable(GU_DITHER), c'est plus propre vu que ça stocke l'état courant afin que vous puissiez vous en souvenir ;)
+ - oslGetImageSizeX et oslGetImageSizeY renommé en oslGetImageWidth et oslGetImageHeight, et même si les anciens sont toujours accessibles, vous devriez éviter de les utiliser. Renommez vos appels vers ces fonctions.
+ - oslLoadPalette renommé en oslCreatePaletteFrom.
+ - La plupart des fonctions de la VFPU ont été retirées, elles n'étaient de toute façon pas documentées et complètement inutiles puisque la FPU est à présent utilisée en standard. Faites juste attention à bien utiliser des float et non des double. Par exemple, pour les constantes numériques à virgule, il faut toujours rajouter un 'f' à la fin. Exemple: 'f * 0.1f' au lieu de 'f * 0.1'.
+    - Remplacez r = vfpu_add(f1, f2) par r = f1 + f2 (ça sera même plus rapide)
+    - Remplacez r = vfpu_sub(f1, f2) par r = f1 - f2 (pareil)
+    - Remplacez r = vfpu_mul(f1, f2) par r = f1 * f2
+    - Remplacez r = vfpu_div(f1, f2) par r = f1 / f2
+    - Remplacez r = vfpu_f2i(v) par r = (int)v
+    - Remplacez r = vfpu_i2f(v) par r = (float)v
+    - vfpu_sini(f1, f2) et vfpu_cosi(f1, f2) étaient buguées, utilisez oslCos et oslSin ou oslCosi et oslSini.
+    - Remplacez r = vfpu_isubf(f1, f2) par r = (int)(f1 - f2).
+ - osl_currentAlphaCoeff contient à présent la teinte complète. Avant, si vous appeliez par exemple oslSetAlpha(OSL_FX_ALPHA, 0x80) il aurait contenu 0x80, maintenant il contiendra 0x80ffffff.
+
+
