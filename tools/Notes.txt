@@ -1,1 +1,1 @@
-
+wav2bgm only supports mono .wav files
