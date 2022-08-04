@@ -14,9 +14,9 @@ To make a bgm file, use the wav2bgm tool in the tools folder with a mono .wav fi
 
 ## Links/credits
 Sakya: https://www.sakya.it/OSLib_MOD/doc/
+Brunni: http://oslib.palib.info/
 
 ## License
 
 Same as Brunni's, there's no additions to the libray for any of these changes.
 
-Brunni: http://oslib.palib.info/
