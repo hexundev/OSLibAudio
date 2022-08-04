@@ -18,5 +18,5 @@ Brunni: http://oslib.palib.info/
 
 ## License
 
-Same as Brunni's, there's no additions to the libray for any of these changes.
+Same as Brunni's, there's no additions to the library for any of these changes.
 
