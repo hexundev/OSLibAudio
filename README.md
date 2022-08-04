@@ -5,6 +5,12 @@ Included is the changelogs/readmes by Brunni and Sakya.
 
 This was tested with the Minimalist PSP SDK 0.15.0.
 
-## Links
-https://www.sakya.it/OSLib_MOD/doc/
-http://oslib.palib.info/
+## Sample
+The sample shows loading and playing a sound effect and music.
+
+You must supply a .wav and a .bgm file for the sample to work.
+To make a bgm file, use the wav2bgm tool in the tools folder with a mono .wav file.
+
+## Links/Credits
+Sakya: https://www.sakya.it/OSLib_MOD/doc/
+Brunni: http://oslib.palib.info/
