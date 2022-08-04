@@ -1,4 +1,4 @@
-# OSLibAudio (mod) for the PSP
+# OSLibAudio for the PSP
 
 This is the audio part of Sakya's OSLib MOD v1, which is a mod of Brunni's OSLib 2.
 
